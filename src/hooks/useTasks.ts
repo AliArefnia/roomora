@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/supabaseClient";
 
 export interface Task {
   id: number;
@@ -18,7 +18,8 @@ export function useTasks() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "tasks" },
-        () => {
+        (payload) => {
+          console.log(payload);
           fetchTasks();
         }
       )
