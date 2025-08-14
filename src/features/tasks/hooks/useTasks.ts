@@ -1,10 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import { useRoomStore } from "@/stores/tasksStore";
 import type { Task } from "@/types/types";
 
 export function useTasks(roomId: string) {
   const { setTasks, updateTask, removeTask, addTask, tasks } = useRoomStore();
+  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [errorFetchingTask, setErrorFetchingTasks] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (!roomId) return;
@@ -61,15 +65,25 @@ export function useTasks(roomId: string) {
   }, [roomId, addTask, updateTask, removeTask, setTasks]);
 
   async function fetchTasks(roomId: string) {
+    setLoadingTasks(true);
+    setErrorFetchingTasks(null);
+
     const { data, error } = await supabase
       .from("tasks")
       .select("*")
       .eq("room_id", roomId);
-    if (!error && data) {
-      console.log(data);
+
+    setLoadingTasks(false);
+
+    if (error) {
+      setErrorFetchingTasks(error.message);
+      return;
+    }
+
+    if (data) {
       setTasks(data);
     }
   }
 
-  return { tasks };
+  return { tasks, loadingTasks, errorFetchingTask };
 }
