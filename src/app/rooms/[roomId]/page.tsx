@@ -1,4 +1,4 @@
-import RoomLayout from "./RoomLayout";
+import RoomLayout from "../../../features/room/components/RoomLayout";
 import { getRoomData } from "@/lib/supabase/rooms";
 
 export default async function RoomPage({
